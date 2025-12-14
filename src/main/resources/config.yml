@@ -1,0 +1,64 @@
+#############################################################################################################
+# +-------------------------------------------------------------------------------------------------------+ #
+# |                                                                                                       | #
+# |     ░██████╗████████╗░█████╗░███╗░░██╗███████╗░█████╗░██╗░░░██╗████████╗████████╗███████╗██████╗░     | #
+# |     ██╔════╝╚══██╔══╝██╔══██╗████╗░██║██╔════╝██╔══██╗██║░░░██║╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗     | #
+# |     ╚█████╗░░░░██║░░░██║░░██║██╔██╗██║█████╗░░██║░░╚═╝██║░░░██║░░░██║░░░░░░██║░░░█████╗░░██████╔╝     | #
+# |     ░╚═══██╗░░░██║░░░██║░░██║██║╚████║██╔══╝░░██║░░██╗██║░░░██║░░░██║░░░░░░██║░░░██╔══╝░░██╔══██╗     | #
+# |     ██████╔╝░░░██║░░░╚█████╔╝██║░╚███║███████╗╚█████╔╝╚██████╔╝░░░██║░░░░░░██║░░░███████╗██║░░██║     | #
+# |     ╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░╚══╝╚══════╝░╚════╝░░╚═════╝░░░░╚═╝░░░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝     | #
+# |                                                                                                       | #
+# +-------------------------------------------------------------------------------------------------------+ #
+#############################################################################################################
+
+# +-------------------------------------------------------------------------------------------------------+ #
+# |                                                                                                       | #
+# |                                           ESSENTIAL SETTINGS                                          | #
+# |                                                                                                       | #
+# |                    Important settings that control how StonecutterDamage functions.                   | #
+# |                                                                                                       | #
+# +-------------------------------------------------------------------------------------------------------+ #
+
+# Enable or disable Stonecutter damage handling
+# Default: true
+enabled: true
+# Permission that allows players to ignore stonecutter damage
+# Default: stonecutter.bypass
+permission: stonecutter.bypass
+
+# Amount of damage dealt per hit (in half-hearts)
+# 1 = 0.5 heart
+# Default: 1.0
+damage-amount: 1.0
+# Initial delay before the damage task starts (in ticks)
+# 20 ticks = 1 second
+# Default: 20
+task-delay: 20
+# Interval between damage checks (in ticks)
+# 20 ticks = 1 second
+# Default: 20
+task-period: 20
+# List of worlds where StonecutterDamage is active
+# Only entities/players in these worlds will be checked
+# Default: ["world", "world_nether", "world_the_end"]
+allowed-worlds:
+  - world
+  - world_nether
+  - world_the_end
+# List of entity types that are excluded from StonecutterDamage
+# Use Bukkit entity type names, e.g., ZOMBIE, CREEPER, ARMOR_STAND
+# Default: ["ARMOR_STAND", "ITEM_FRAME"]
+blacklisted-entities:
+  - ARMOR_STAND
+  - ITEM_FRAME
+
+# Help command output
+# {0} replaces with the command label
+# /stonecutter help
+help-messages:
+  - "§7=== §aStonecutterDamage Commands §7==="
+  - "§e/{0} help §8- §fShows this help message."
+  - "§e/{0} reload §8- §fReloads the config."
+# Message shown after successful config reload
+# /stonecutter reload
+reload-message: "§8[§aStonecutter§8] §fSuccessfully reloaded the config."

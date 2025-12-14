@@ -1,0 +1,73 @@
+plugins {
+    id("java")
+    id("io.github.goooler.shadow") version "8.1.8"
+}
+
+group = "kz.hxncus.mc"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
+    }
+}
+
+def spigot = project.property("spigot")
+def lombok = project.property("lombok")
+def bstats = project.property("bstats")
+def junit = project.property("junit")
+def mockito = project.property("mockito")
+
+dependencies {
+    // Spigot
+    compileOnly("org.spigotmc:spigot-api:${spigot}-R0.1-SNAPSHOT")
+    testImplementation("org.spigotmc:spigot-api:${spigot}-R0.1-SNAPSHOT")
+
+    // Lombok
+    compileOnly("org.projectlombok:lombok:${lombok}")
+    annotationProcessor("org.projectlombok:lombok:${lombok}")
+
+    // BStats
+    implementation("org.bstats:bstats-bukkit:${bstats}")
+
+    // JUnit and Mockito
+    testImplementation("org.junit.jupiter:junit-jupiter:${junit}")
+    testImplementation("org.mockito:mockito-core:${mockito}")
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(8)
+    withJavadocJar()
+    withSourcesJar()
+}
+
+build {
+    dependsOn(shadowJar)
+}
+
+shadowJar {
+    archiveClassifier.set("")
+    archiveFileName.set("${rootProject.name}-${version}.jar")
+    relocate("org.bstats", project.group.toString() + ".stonecutterdamage.metrics")
+    mustRunAfter(clean)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}

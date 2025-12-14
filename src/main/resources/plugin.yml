@@ -1,0 +1,10 @@
+name: StonecutterDamage
+version: '${version}'
+main: kz.hxncus.mc.stonecutterdamage.StonecutterDamage
+api-version: '1.13'
+authors: [Hxncus]
+commands:
+  stonecutter:
+    permission: "stonecutter.command"
+    aliases:
+      - sc
