@@ -37,7 +37,7 @@ task-delay: 20
 # Interval between damage checks (in ticks)
 # 20 ticks = 1 second
 # Default: 20
-task-period: 20
+task-interval: 20
 # List of worlds where StonecutterDamage is active
 # Only entities/players in these worlds will be checked
 # Default: ["world", "world_nether", "world_the_end"]
