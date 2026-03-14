@@ -54,7 +54,7 @@ public final class StonecutterDamage extends JavaPlugin {
     }
 
     private void registerTasks() {
-        new DamageTask(instance, contacts, entities, config).runTaskTimer(this, config.getTaskDelay(), config.getTaskInterval());
+        new DamageTask(contacts, entities, config).runTaskTimer(this, config.getTaskDelay(), config.getTaskInterval());
     }
 
     private void registerCommands() {
