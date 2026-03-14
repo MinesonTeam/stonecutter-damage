@@ -57,7 +57,8 @@ public class DamageTask extends BukkitRunnable {
             }
 
             for (LivingEntity entity : world.getLivingEntities()) {
-                if (entity instanceof Player || blacklistedEntities.contains(entity.getType().name()) || entity.isDead()) {
+                if (entity instanceof Player || blacklistedEntities.contains(entity.getType().name()) || !entity.isValid()) {
+                    entities.remove(entity);
                     continue;
                 }
                 Location location = entity.getLocation();
