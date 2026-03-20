@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -72,6 +73,14 @@ public class DamageTask extends BukkitRunnable {
                 continue;
             }
 
+            World world = entity.getWorld();
+            if (config.isSoundEffectEnabled()) {
+                world.playSound(location, config.getSoundEffect(), config.getSoundEffectVolume(), config.getSoundEffectPitch());
+            }
+            if (config.isParticleEffectEnabled()) {
+                BlockData data = config.getParticleEffectMaterial().createBlockData();
+                world.spawnParticle(config.getParticleEffect(), location.clone().add(0, 1, 0), config.getParticleEffectCount(), data);
+            }
             entity.damage(damageAmount);
             entities.put(entity, new BlockVector(block.getX(), block.getY(), block.getZ()));
         }
@@ -87,11 +96,20 @@ public class DamageTask extends BukkitRunnable {
                 continue;
             }
 
-            if (player.getLocation().getBlock().getType() != Material.STONECUTTER) {
+            Location location = player.getLocation();
+            if (location.getBlock().getType() != Material.STONECUTTER) {
                 contacts.remove(player);
                 continue;
             }
 
+            World world = player.getWorld();
+            if (config.isSoundEffectEnabled()) {
+                world.playSound(location, config.getSoundEffect(), config.getSoundEffectVolume(), config.getSoundEffectPitch());
+            }
+            if (config.isParticleEffectEnabled()) {
+                BlockData data = config.getParticleEffectMaterial().createBlockData();
+                world.spawnParticle(config.getParticleEffect(), location.clone().add(0, 1, 0), config.getParticleEffectCount(), data);
+            }
             player.damage(damageAmount);
         }
     }

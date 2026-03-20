@@ -52,6 +52,18 @@ blacklisted-entities:
   - ARMOR_STAND
   - ITEM_FRAME
 
+effects:
+  sounds:
+    enabled: true
+    sound: "UI_STONECUTTER_TAKE_RESULT"
+    volume: 0.5
+    pitch: 1.5
+  particles:
+    enabled: true
+    type: "BLOCK_CRACK"
+    material: "REDSTONE_BLOCK"
+    count: 10
+
 # Help command output
 # {0} replaces with the command label
 # /stonecutter help

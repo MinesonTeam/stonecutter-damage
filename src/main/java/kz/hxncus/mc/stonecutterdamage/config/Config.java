@@ -2,6 +2,9 @@ package kz.hxncus.mc.stonecutterdamage.config;
 
 
 import kz.hxncus.mc.stonecutterdamage.StonecutterDamage;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.HashSet;
@@ -62,5 +65,49 @@ public class Config {
 
     public Set<String> getBlacklistedEntities() {
         return new HashSet<>(config.getStringList("blacklisted-entities"));
+    }
+
+    public boolean isSoundEffectEnabled() {
+        return config.getBoolean("effects.sounds.enabled", true);
+    }
+
+    public float getSoundEffectVolume() {
+        return (float) config.getDouble("effects.sounds.volume", 1.0);
+    }
+
+    public float getSoundEffectPitch() {
+        return (float) config.getDouble("effects.sounds.pitch", 1.0);
+    }
+
+    public Sound getSoundEffect() {
+        try {
+            return Sound.valueOf(config.getString("effects.sounds.sound"));
+        } catch (IllegalArgumentException ignored) {
+            return Sound.UI_STONECUTTER_TAKE_RESULT;
+        }
+    }
+
+    public boolean isParticleEffectEnabled() {
+        return config.getBoolean("effects.particles.enabled", true);
+    }
+
+    public Particle getParticleEffect() {
+        try {
+            return Particle.valueOf(config.getString("effects.particles.type"));
+        } catch (IllegalArgumentException ignored) {
+            return Particle.BLOCK_CRACK;
+        }
+    }
+
+    public Material getParticleEffectMaterial() {
+        try {
+            return Material.valueOf(config.getString("effects.particles.material"));
+        } catch (IllegalArgumentException ignored) {
+            return Material.REDSTONE_BLOCK;
+        }
+    }
+
+    public int getParticleEffectCount() {
+        return config.getInt("effects.particles.count", 10);
     }
 }
