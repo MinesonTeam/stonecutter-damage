@@ -3,11 +3,9 @@ package kz.hxncus.mc.stonecutterdamage.task;
 import kz.hxncus.mc.stonecutterdamage.config.Config;
 import kz.hxncus.mc.stonecutterdamage.data.StonecutterContacts;
 import kz.hxncus.mc.stonecutterdamage.data.StonecutterEntities;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -59,8 +57,12 @@ public class DamageTask extends BukkitRunnable {
             if (entity == null) {
                 continue;
             }
-            if (!entity.isValid() || entity instanceof Player || blacklisted.contains(entity.getType().name())) {
+            if (!entity.isValid() || entity.isInvulnerable() || entity instanceof Player || blacklisted.contains(entity.getType().name())) {
                 entities.remove(entity);
+                continue;
+            }
+
+            if (entity.getNoDamageTicks() > entity.getMaximumNoDamageTicks() / 2.0F) {
                 continue;
             }
 
@@ -72,7 +74,8 @@ public class DamageTask extends BukkitRunnable {
                 continue;
             }
 
-            entity.damage(damageAmount);
+
+            applyDamage(entity, damageAmount, location);
             entities.put(entity, new BlockVector(block.getX(), block.getY(), block.getZ()));
         }
     }
@@ -82,17 +85,25 @@ public class DamageTask extends BukkitRunnable {
         Set<String> allowedWorlds = config.getAllowedWorlds();
 
         for (Player player : new ArrayList<>(contacts.getAll())) {
-            if (!player.isOnline() || !player.isValid() || !allowedWorlds.contains(player.getWorld().getName())) {
+            GameMode gameMode = player.getGameMode();
+            if (!player.isOnline() || !player.isValid() || player.isInvulnerable() ||
+                    gameMode == GameMode.CREATIVE || gameMode == GameMode.SPECTATOR ||
+                    !allowedWorlds.contains(player.getWorld().getName())) {
                 contacts.remove(player);
                 continue;
             }
 
-            if (player.getLocation().getBlock().getType() != Material.STONECUTTER) {
+            if (player.getNoDamageTicks() > player.getMaximumNoDamageTicks() / 2.0F) {
+                continue;
+            }
+
+            Location location = player.getLocation();
+            if (location.getBlock().getType() != Material.STONECUTTER) {
                 contacts.remove(player);
                 continue;
             }
 
-            player.damage(damageAmount);
+            applyDamage(player, damageAmount, location);
         }
     }
 
@@ -106,5 +117,44 @@ public class DamageTask extends BukkitRunnable {
             }
         }
         return list;
+    }
+
+    private void applyDamage(LivingEntity entity, double damageAmount, Location location) {
+        double healthBefore = entity.getHealth();
+        entity.damage(damageAmount);
+
+        if (!entity.isDead() && entity.getHealth() >= healthBefore && entity.getNoDamageTicks() != entity.getMaximumNoDamageTicks()) {
+            return;
+        }
+
+        if (!config.isEffectsEnabled()) {
+            return;
+        }
+
+        World world = entity.getWorld();
+        if (config.isSoundEffectEnabled()) {
+            world.playSound(location, config.getSoundEffect(), config.getSoundEffectVolume(), config.getSoundEffectPitch());
+        }
+
+        if (config.isParticleEffectEnabled()) {
+            Object data = null;
+
+            if (config.getParticleEffectType().getDataType() == BlockData.class) {
+                data = config.getParticleEffectMaterial().createBlockData();
+            }
+
+            world.spawnParticle(
+                config.getParticleEffectType(),
+                location.getX() + config.getParticleEffectSpawnOffsetX(),
+                location.getY() + config.getParticleEffectSpawnOffsetY(),
+                location.getZ() + config.getParticleEffectSpawnOffsetZ(),
+                config.getParticleEffectCount(),
+                config.getParticleEffectOffsetX(),
+                config.getParticleEffectOffsetY(),
+                config.getParticleEffectOffsetZ(),
+                config.getParticleEffectExtra(),
+                data
+            );
+        }
     }
 }
