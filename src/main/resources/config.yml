@@ -53,6 +53,7 @@ blacklisted-entities:
   - ITEM_FRAME
 
 effects:
+  enabled: true
   sounds:
     enabled: true
     sound: "UI_STONECUTTER_TAKE_RESULT"
@@ -63,6 +64,15 @@ effects:
     type: "BLOCK_CRACK"
     material: "REDSTONE_BLOCK"
     count: 10
+    extra: 0.1
+    spawn-offset:
+      x: 0.5
+      y: 1.0
+      z: 0.5
+    offset:
+      x: 0.5
+      y: 0.5
+      z: 0.5
 
 # Help command output
 # {0} replaces with the command label

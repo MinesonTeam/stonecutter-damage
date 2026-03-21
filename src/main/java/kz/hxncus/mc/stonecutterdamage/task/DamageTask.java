@@ -73,15 +73,7 @@ public class DamageTask extends BukkitRunnable {
                 continue;
             }
 
-            World world = entity.getWorld();
-            if (config.isSoundEffectEnabled()) {
-                world.playSound(location, config.getSoundEffect(), config.getSoundEffectVolume(), config.getSoundEffectPitch());
-            }
-            if (config.isParticleEffectEnabled()) {
-                BlockData data = config.getParticleEffectMaterial().createBlockData();
-                world.spawnParticle(config.getParticleEffect(), location.clone().add(0, 1, 0), config.getParticleEffectCount(), data);
-            }
-            entity.damage(damageAmount);
+            applyDamage(entity, damageAmount, location);
             entities.put(entity, new BlockVector(block.getX(), block.getY(), block.getZ()));
         }
     }
@@ -102,15 +94,7 @@ public class DamageTask extends BukkitRunnable {
                 continue;
             }
 
-            World world = player.getWorld();
-            if (config.isSoundEffectEnabled()) {
-                world.playSound(location, config.getSoundEffect(), config.getSoundEffectVolume(), config.getSoundEffectPitch());
-            }
-            if (config.isParticleEffectEnabled()) {
-                BlockData data = config.getParticleEffectMaterial().createBlockData();
-                world.spawnParticle(config.getParticleEffect(), location.clone().add(0, 1, 0), config.getParticleEffectCount(), data);
-            }
-            player.damage(damageAmount);
+            applyDamage(player, damageAmount, location);
         }
     }
 
@@ -124,5 +108,44 @@ public class DamageTask extends BukkitRunnable {
             }
         }
         return list;
+    }
+
+    private void applyDamage(LivingEntity entity, double damageAmount, Location location) {
+        double healthBefore = entity.getHealth();
+        entity.damage(damageAmount);
+
+        if (!entity.isDead() && entity.getHealth() >= healthBefore && entity.getNoDamageTicks() != entity.getMaximumNoDamageTicks()) {
+            return;
+        }
+
+        if (!config.isEffectsEnabled()) {
+            return;
+        }
+
+        World world = entity.getWorld();
+        if (config.isSoundEffectEnabled()) {
+            world.playSound(location, config.getSoundEffect(), config.getSoundEffectVolume(), config.getSoundEffectPitch());
+        }
+
+        if (config.isParticleEffectEnabled()) {
+            Object data = null;
+
+            if (config.getParticleEffectType().getDataType() == BlockData.class) {
+                data = config.getParticleEffectMaterial().createBlockData();
+            }
+
+            world.spawnParticle(
+                config.getParticleEffectType(),
+                location.getX() + config.getParticleEffectSpawnOffsetX(),
+                location.getY() + config.getParticleEffectSpawnOffsetY(),
+                location.getZ() + config.getParticleEffectSpawnOffsetZ(),
+                config.getParticleEffectCount(),
+                config.getParticleEffectOffsetX(),
+                config.getParticleEffectOffsetY(),
+                config.getParticleEffectOffsetZ(),
+                config.getParticleEffectExtra(),
+                data
+            );
+        }
     }
 }
