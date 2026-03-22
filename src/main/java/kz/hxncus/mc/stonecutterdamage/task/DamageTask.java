@@ -4,7 +4,6 @@ import kz.hxncus.mc.stonecutterdamage.config.Config;
 import kz.hxncus.mc.stonecutterdamage.data.StonecutterContacts;
 import kz.hxncus.mc.stonecutterdamage.data.StonecutterEntities;
 import org.bukkit.*;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -167,10 +166,18 @@ public class DamageTask extends BukkitRunnable {
         }
 
         if (config.isParticleEffectEnabled()) {
-            Object data = null;
+            Particle particleEffectType = config.getParticleEffectType();
+            Class<?> dataType = particleEffectType.getDataType();
 
-            if (config.getParticleEffectType().getDataType() == BlockData.class) {
-                data = config.getParticleEffectMaterial().createBlockData();
+            Material particleEffectMaterial = config.getParticleEffectMaterial();
+            Object particleData = null;
+
+            if (dataType == org.bukkit.block.data.BlockData.class) {
+                particleData = org.bukkit.Bukkit.createBlockData(particleEffectMaterial);
+            } else if (dataType == org.bukkit.inventory.ItemStack.class) {
+                particleData = new org.bukkit.inventory.ItemStack(particleEffectMaterial);
+            } else if (dataType == org.bukkit.Particle.DustOptions.class) {
+                particleData = new org.bukkit.Particle.DustOptions(org.bukkit.Color.RED, 1.0F);
             }
 
             world.spawnParticle(
@@ -183,7 +190,7 @@ public class DamageTask extends BukkitRunnable {
                 config.getParticleEffectOffsetY(),
                 config.getParticleEffectOffsetZ(),
                 config.getParticleEffectExtra(),
-                data
+                particleData
             );
         }
     }
