@@ -47,11 +47,14 @@ jobs:
           VERSION=$(grep "projectVersion=" gradle.properties | cut -d'=' -f2 | tr -d '\r')
           echo "version=$VERSION" >> $GITHUB_ENV
 
-      - name: Build Changelog
-        id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@v4
+      - name: Fetch Changelog from GitHub
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EOF=$(cat /proc/sys/kernel/random/uuid)
+          echo "CHANGELOG<<$EOF" >> $GITHUB_ENV
+          gh release view v${{ env.version }} --json body -q .body >> $GITHUB_ENV
+          echo "$EOF" >> $GITHUB_ENV
       
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -72,14 +75,14 @@ jobs:
 
           # Release Metadata
           name: ${{ env.name }} v${{ env.version }}
-          changelog: ${{ steps.build_changelog.outputs.changelog }}
+          changelog: ${{ env.CHANGELOG }}
           
           version: ${{ env.version }}
           version-type: release
           
           # Supported Platforms & Versions
           loaders: bukkit, paper, purpur, spigot
-          game-versions: ">=1.8 <=1.21.11"
+          game-versions: ">=1.14 <=1.21.11"
 
           # Path to the compiled jar
           files: build/libs/${{ env.name }}-${{ env.version }}.jar

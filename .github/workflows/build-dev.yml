@@ -69,7 +69,7 @@ jobs:
           version-type: alpha
           
           loaders: bukkit, paper, purpur, spigot
-          game-versions: ">=1.8 <=1.21.11"
+          game-versions: ">=1.14 <=1.21.11"
           
           files: build/libs/*.jar
 
