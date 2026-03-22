@@ -1,9 +1,8 @@
 package kz.hxncus.mc.stonecutterdamage.data;
 
-import org.bukkit.entity.Player;
-
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * StonecutterContacts part of the StonecutterDamage Minecraft plugin.
@@ -13,21 +12,21 @@ import java.util.Set;
  */
 public class StonecutterContacts {
 
-    private final Set<Player> players = new HashSet<>();
+    private final Set<UUID> players = new HashSet<>();
 
-    public void add(Player player) {
-        players.add(player);
+    public void add(UUID uniqueId) {
+        players.add(uniqueId);
     }
 
-    public void remove(Player player) {
-        players.remove(player);
+    public void remove(UUID uniqueId) {
+        players.remove(uniqueId);
     }
 
-    public boolean contains(Player player) {
-        return players.contains(player);
+    public boolean contains(UUID uniqueId) {
+        return players.contains(uniqueId);
     }
 
-    public Set<Player> getAll() {
+    public Set<UUID> getAll() {
         return players;
     }
 }
