@@ -13,6 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.UUID;
+
 /**
  * StonecutterListener part of the stonecutter-damage Minecraft plugin.
  *
@@ -52,16 +54,19 @@ public class StonecutterListener implements Listener {
         }
 
         Block block = to.getBlock();
+        UUID uniqueId = player.getUniqueId();
         if (block.getType() != Material.STONECUTTER) {
+            contacts.remove(uniqueId);
             return;
         }
 
-        contacts.add(player);
+        contacts.add(uniqueId);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        contacts.remove(player);
+        UUID uniqueId = player.getUniqueId();
+        contacts.remove(uniqueId);
     }
 }
