@@ -52,7 +52,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body "### 🛠 Test build assembled!
+          gh pr comment ${{ github.event.pull_request.number }} --body "### 🛠 Test build ${{ env.name }}-${{ env.version }}-PR-${{ github.event.pull_request.number }} assembled!
           
           Testers can download the finished \`.jar\` file from the link below:
           📦 [**Download the archive with the plugin**](${{ steps.artifact-upload.outputs.artifact-url }})
