@@ -37,7 +37,7 @@ task-delay: 20
 # Interval between damage checks (in ticks)
 # 20 ticks = 1 second
 # Default: 20
-task-interval: 20
+task-period: 20
 # List of worlds where StonecutterDamage is active
 # Only entities/players in these worlds will be checked
 # Default: ["world", "world_nether", "world_the_end"]
@@ -51,28 +51,6 @@ allowed-worlds:
 blacklisted-entities:
   - ARMOR_STAND
   - ITEM_FRAME
-
-effects:
-  enabled: true
-  sounds:
-    enabled: true
-    sound: "UI_STONECUTTER_TAKE_RESULT"
-    volume: 0.5
-    pitch: 1.5
-  particles:
-    enabled: true
-    type: "BLOCK_CRACK"
-    material: "REDSTONE_BLOCK"
-    count: 10
-    extra: 0.1
-    spawn-offset:
-      x: 0.5
-      y: 1.0
-      z: 0.5
-    offset:
-      x: 0.5
-      y: 0.5
-      z: 0.5
 
 # Help command output
 # {0} replaces with the command label
