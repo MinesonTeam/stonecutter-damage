@@ -4,7 +4,6 @@ import kz.hxncus.mc.stonecutterdamage.config.Config;
 import kz.hxncus.mc.stonecutterdamage.data.StonecutterContacts;
 import kz.hxncus.mc.stonecutterdamage.data.StonecutterEntities;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -12,10 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockVector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * DamageTask part of the StonecutterDamage Minecraft plugin.
@@ -29,6 +25,10 @@ public class DamageTask extends BukkitRunnable {
     private final StonecutterEntities entities;
     private final Config config;
 
+    private Iterator<LivingEntity> entityIterator;
+    private int entitiesPerTick;
+    private int tickCounter;
+
     public DamageTask(StonecutterContacts contacts, StonecutterEntities entities, Config config) {
         this.contacts = contacts;
         this.entities = entities;
@@ -37,40 +37,67 @@ public class DamageTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        long intervalTicks = Math.max(1, config.getTaskInterval());
+
+        if (tickCounter >= intervalTicks) {
+            tickCounter = 0;
+        }
+
         double damageAmount = config.getDamageAmount();
         Set<String> blacklistedEntities = config.getBlacklistedEntities();
         Set<String> allowedWorlds = config.getAllowedWorlds();
 
-        damagePlayers(damageAmount, allowedWorlds);
-        damageEntities(damageAmount, allowedWorlds, blacklistedEntities);
-    }
+        if (tickCounter == 0) {
+            damagePlayers(damageAmount, allowedWorlds);
 
-    private void damageEntities(double damageAmount, Set<String> allowedWorlds, Set<String> blacklistedEntities) {
-        for (LivingEntity entity : collectEntities(allowedWorlds, blacklistedEntities)) {
-            if (entity.getNoDamageTicks() > entity.getMaximumNoDamageTicks() / 2.0F) {
-                continue;
-            }
+            List<LivingEntity> allEntities = collectEntities(allowedWorlds, blacklistedEntities);
+            entityIterator = allEntities.iterator();
 
-            Location location = entity.getLocation();
-            BlockVector blockVector = new BlockVector(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            if (blockVector.equals(entities.get(entity))) {
-                applyDamage(entity, damageAmount, location);
-                continue;
-            }
-
-            Block block = location.getBlock();
-            if (block.getType() != Material.STONECUTTER) {
-                entities.remove(entity);
-                continue;
-            }
-
-            applyDamage(entity, damageAmount, location);
-            entities.put(entity, new BlockVector(block.getX(), block.getY(), block.getZ()));
+            entitiesPerTick = (int) Math.ceil((double) allEntities.size() / intervalTicks);
+            entitiesPerTick = Math.max(25, entitiesPerTick);
         }
+
+        if (entityIterator != null) {
+            int processed = 0;
+            boolean isLastTick = (tickCounter == intervalTicks - 1);
+
+            while (entityIterator.hasNext() && (isLastTick || processed < entitiesPerTick)) {
+                LivingEntity entity = entityIterator.next();
+                processed++;
+
+                if (!entity.isValid() || entity instanceof Player || !entity.isOnGround() ||
+                        entity.isInvulnerable() || blacklistedEntities.contains(entity.getType().name())) {
+                    entities.remove(entity);
+                    continue;
+                }
+
+                if (entity.getNoDamageTicks() > entity.getMaximumNoDamageTicks() / 2.0F) {
+                    continue;
+                }
+
+                Location location = entity.getLocation();
+                BlockVector currentPos = new BlockVector(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+                BlockVector lastPos = entities.get(entity);
+
+                if (currentPos.equals(lastPos)) {
+                    applyDamage(entity, damageAmount, location);
+                    continue;
+                }
+
+                if (location.getBlock().getType() == Material.STONECUTTER) {
+                    applyDamage(entity, damageAmount, location);
+                    entities.put(entity, currentPos);
+                } else {
+                    entities.remove(entity);
+                }
+            }
+        }
+
+        tickCounter++;
     }
 
     private void damagePlayers(double damageAmount, Set<String> allowedWorlds) {
-        for (UUID uniqueId : contacts.getAll()) {
+        for (UUID uniqueId : new HashSet<>(contacts.getAll())) {
             Player player = Bukkit.getPlayer(uniqueId);
             if (player == null || !player.isOnline() || !player.isValid() || player.isInvulnerable()) {
                 contacts.remove(uniqueId);
@@ -111,7 +138,7 @@ public class DamageTask extends BukkitRunnable {
 
                 EntityType entityType = entity.getType();
                 if (!entity.isValid() || entity.isInvulnerable() || blacklistedEntities.contains(entityType.name()) || !entity.isOnGround()) {
-                    contacts.remove(entity.getUniqueId());
+                    entities.remove(entity);
                     continue;
                 }
 
