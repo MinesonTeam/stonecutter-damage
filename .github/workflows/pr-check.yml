@@ -37,7 +37,7 @@ jobs:
       - name: Extract Name from settings.gradle
         id: get_name
         run: |
-          NAME=$(grep "rootProject.name = " settings.gradle | cut -d'=' -f2 | tr -d '\r')
+          NAME=$(grep "rootProject.name" settings.gradle | cut -d'=' -f2 | tr -d " \r'\"")
           echo "name=$NAME" >> $GITHUB_ENV
 
       - name: Upload Artifact for Testing
