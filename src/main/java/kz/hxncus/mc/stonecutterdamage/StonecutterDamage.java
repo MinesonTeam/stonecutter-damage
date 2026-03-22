@@ -6,12 +6,12 @@ import kz.hxncus.mc.stonecutterdamage.data.StonecutterContacts;
 import kz.hxncus.mc.stonecutterdamage.data.StonecutterEntities;
 import kz.hxncus.mc.stonecutterdamage.listener.StonecutterListener;
 import kz.hxncus.mc.stonecutterdamage.task.DamageTask;
+import lombok.Getter;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
-import lombok.Getter;
 
 public final class StonecutterDamage extends JavaPlugin {
     
@@ -54,7 +54,7 @@ public final class StonecutterDamage extends JavaPlugin {
     }
 
     private void registerTasks() {
-        new DamageTask(instance, contacts, entities, config).runTaskTimer(this, config.getTaskDelay(), config.getTaskInterval());
+        new DamageTask(contacts, entities, config).runTaskTimer(this, config.getTaskDelay(), 1);
     }
 
     private void registerCommands() {
