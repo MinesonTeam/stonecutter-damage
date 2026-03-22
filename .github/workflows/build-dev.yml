@@ -48,6 +48,12 @@ jobs:
             mv "$file" "${file%.jar}-dev.${{ github.run_number }}.jar"
           done
 
+      - name: Get Last Commit Message
+        id: last_commit
+        run: |
+          MSG=$(git log -1 --pretty=format:'%s')
+          echo "commit_msg=$MSG" >> $GITHUB_ENV
+      
       - name: Publish Dev Build to Modrinth and CurseForge
         uses: Kir-Antipov/mc-publish@v3.3
         with:
@@ -57,6 +63,7 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           
           name: ${{ env.name }} ${{ env.version }} (Dev ${{ github.run_number }})
+          changelog: ${{ env.commit_msg }}
           
           version: ${{ env.version }}-alpha.${{ github.run_number }}
           version-type: alpha
